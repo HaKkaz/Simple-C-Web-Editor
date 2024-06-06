@@ -42,9 +42,31 @@
 </head>
 <body>
     <h1>Simple Web Editor</h1>
-    <textarea class="editor" placeholder="Type your text here..."></textarea>
+    <textarea id="editor" class="editor" placeholder="Type your text here..."></textarea>
     <div class="button-container">
-        <button>Compile</button>
+        <button id="compileButton">Compile</button>
     </div>
+
+    <script>
+        document.getElementById('compileButton').addEventListener('click', function() {
+            var editorContent = document.getElementById('editor').value;
+
+            fetch('/compile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: editorContent }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Do something with the response if needed
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
 </body>
 </html>
