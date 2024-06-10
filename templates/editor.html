@@ -50,7 +50,6 @@
     <script>
         document.getElementById('compileButton').addEventListener('click', function() {
             var editorContent = document.getElementById('editor').value;
-
             fetch('/compile', {
                 method: 'POST',
                 headers: {
@@ -60,8 +59,12 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Success:', data);
-                // Do something with the response if needed
+                if (data.status === 'error') {
+                    alert('Error: ' + data.content);
+                } else {
+                    console.log('Success:', data);
+                    // Do something with the success response if needed
+                }
             })
             .catch((error) => {
                 console.error('Error:', error);
