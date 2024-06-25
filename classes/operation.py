@@ -1,27 +1,13 @@
 from typing import Literal
+from dataclasses import dataclass
 
+@dataclass
 class Operation:
-    """
-    5 parameters:
-    1. edt_actv = {INSERT, DELETE}
-    2. var_name = the modified variable 
-    3. op = {WRITE, READ, KILL}
-    4. mod_node= id of the modified node 
-    5. Order = the order of modified variable in mod_node
-    """
-    def __init__(
-            self, 
-            edt_actv: Literal['INSERT', 'DELETE'], 
-            var_name: str, 
-            op: Literal['WRITE', "READ", "KILL"], 
-            mod_node: int, 
-            Order: int
-        ):
-        self.edt_actv = edt_actv
-        self.var_name = var_name
-        self.op = op
-        self.mod_node = mod_node
-        self.Order = Order
+    edt_actv: Literal['INSERT', 'DELETE'] 
+    var_name: str 
+    op: Literal['WRITE', "READ", "KILL"]
+    mod_node: int | None = None
+    Order: int | None = None
 
     def to_dict(self):
         return {
@@ -31,3 +17,26 @@ class Operation:
             'mod_node': self.mod_node,
             'Order': self.Order
         }
+    
+    def to_tuple(self):
+        return (self.edt_actv, self.var_name, self.op, self.mod_node, self.Order)
+    
+"""
+a = 3;
+c = 4;
+b = 5;
+b = 5;
+d = a + b;
+"""
+
+# Only one node
+"""
+WRITE a node_1 
+WRITE c node_1
+
+WRITE b node_2
+READ a node_2
+
+READ b node_3
+WRTIE d node_3
+"""
