@@ -13,6 +13,7 @@ vars = []
 
 @app.route('/compile', methods=['POST'])
 def compile_code():
+    ff = open("error_place_map.txt", "w")
     data = request.get_json()
     code = data['content']
 
@@ -26,7 +27,6 @@ def compile_code():
     if_it_is_for_loop = False
     change = False
     for i in range(len(lines)):
-        
 
         # Find all variables (words starting with a letter or underscore)
         line_variables = re.findall(variable_pattern, lines[i])
@@ -44,7 +44,7 @@ def compile_code():
             if lines[i][0] == '}':
                 change = True
             continue
-        print('line_variables:', line_variables)   
+        #print('line_variables:', line_variables)   
         if line_variables[0] in decision_pattern:
             if line_variables[0] != 'else':
                 if i != 0:
@@ -57,7 +57,7 @@ def compile_code():
             line_variables.pop(0)
             if len(line_variables) == 0:
                 continue
-        print('node_number', node_number)
+        #print('node_number', node_number)
         written_variable = line_variables[0]
         # decision not include else
         if change and not decision:
@@ -66,8 +66,8 @@ def compile_code():
             node_order = 0
         
 
-        print("vars:", vars)
-        print("kill", written_variable)
+        #print("vars:", vars)
+        #print("kill", written_variable)
         #if written_variable in vars:
         if decision:
             if if_it_is_for_loop:
@@ -87,6 +87,7 @@ def compile_code():
                                 Order=node_order
                             )
                         )
+                        ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+'for loop initial-expression part'+'\n')
                         node_order += 1
                 CurNode.add_operation(
                     Operation(
@@ -97,6 +98,7 @@ def compile_code():
                         Order=node_order
                     )
                 )
+                ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+'for loop initial-expression part'+'\n')
                 node_order += 1
                 CurNode.add_operation(
                     Operation(
@@ -107,6 +109,7 @@ def compile_code():
                         Order=node_order
                     )
                 )
+                ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+'for loop initial-expression part'+'\n')
                 node_order += 1
                 second = re.findall(variable_pattern, for_init[1])
                 for j in reversed(range(len(second))):
@@ -119,6 +122,7 @@ def compile_code():
                             Order=node_order
                         )
                     )
+                    ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+'for loop condition-expression part'+'\n')
                     node_order += 1
                 third = re.findall(variable_pattern, for_init[2])
                 if len(third) > 1:
@@ -131,6 +135,7 @@ def compile_code():
                             Order=node_order
                         )
                     )
+                    ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+'for loop loop-expression part'+'\n')
                     node_order += 1
                 CurNode.add_operation(
                     Operation(
@@ -141,6 +146,7 @@ def compile_code():
                         Order=node_order
                     )
                 )
+                ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+'for loop loop-expression part'+'\n')
                 node_order += 1
                 CurNode.add_operation(
                     Operation(
@@ -151,6 +157,7 @@ def compile_code():
                         Order=node_order
                     )
                 )
+                ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+'for loop loop-expression part'+'\n')
                 node_order += 1
                 CurNode.add_operation(
                     Operation(
@@ -161,6 +168,7 @@ def compile_code():
                         Order=node_order
                     )
                 )
+                ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+'for loop loop-expression part'+'\n')
                 node_order += 1
                 if_it_is_for_loop = False
             else:
@@ -174,6 +182,7 @@ def compile_code():
                             Order=node_order
                         )
                     )
+                    ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+line_variables[j]+'\n')
                     node_order += 1
             decision = False
         else:
@@ -188,6 +197,7 @@ def compile_code():
                             Order=node_order
                         )
                     )
+                    ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+line_variables[j]+'\n')
                     node_order += 1
                     variables[line_variables[j]] = i
                     vars.append(line_variables[j])
@@ -200,6 +210,7 @@ def compile_code():
                     Order=node_order
                 )
             )
+            ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+written_variable+'\n')
             node_order += 1
             variables[written_variable] = i
             CurNode.add_operation(
@@ -211,14 +222,20 @@ def compile_code():
                     Order=node_order
                 )
             )
+            ff.write(str(node_number)+':'+str(node_order)+'|'+str(i+1)+'|'+line_variables[0]+'\n')
             node_order += 1
             vars.append(line_variables[0])
     
     opt_nodes.append(CurNode)
+    previous_node = 0
     with open('operations.txt', 'w') as f:
         for operation in opt_nodes[0].operations:
-            print(operation.to_tuple())
+            #print(operation.to_tuple())
+            if operation.mod_node != previous_node:
+                f.write('\n')
+                previous_node = operation.mod_node
             f.write(str(operation.to_tuple()) + '\n')
-    
+            
+    ff.close()
     return jsonify({'status': 'success', 'content': ''.join(lines)})
 
