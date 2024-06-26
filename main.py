@@ -4,6 +4,7 @@ app = Flask(__name__)
 
 from routes.mainpage import mainpage
 from routes.compile import compile_code
+from routes.detect import detect_code
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8787, debug=True)

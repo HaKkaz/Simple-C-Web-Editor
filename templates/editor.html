@@ -34,6 +34,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-left: 10px;
         }
         .button-container button:hover {
             background-color: #0056b3;
@@ -45,12 +46,36 @@
     <textarea id="editor" class="editor" placeholder="Type your text here..."></textarea>
     <div class="button-container">
         <button id="compileButton">Compile</button>
+        <button id="detectButton">Detect</button>
     </div>
 
     <script>
         document.getElementById('compileButton').addEventListener('click', function() {
             var editorContent = document.getElementById('editor').value;
             fetch('/compile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: editorContent }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    alert('Error: ' + data.content);
+                } else {
+                    console.log('Success:', data);
+                    // Do something with the success response if needed
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+
+        document.getElementById('detectButton').addEventListener('click', function() {
+            var editorContent = document.getElementById('editor').value;
+            fetch('/detect', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
