@@ -122,9 +122,10 @@
         function showAlert(message) {
             var alertDiv = document.createElement('div');
             alertDiv.className = 'custom-alert';
-            alertDiv.innerHTML = '<p>' + message + '</p><button onclick="this.parentElement.remove()">Close</button>';
+            alertDiv.innerHTML = '<pre>' + message + '</pre><button onclick="this.parentElement.remove()">Close</button>';
             document.body.appendChild(alertDiv);
         }
+
 
         document.getElementById('compileButton').addEventListener('click', function() {
             var editorContent = document.getElementById('editor').value;
