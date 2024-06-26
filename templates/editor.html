@@ -3,23 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Editor</title>
+    <title>Web Editor with Line Numbers</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             margin: 0;
             padding: 20px;
             background-color: #f5f5f5;
         }
-        .editor {
+        .editor-container {
+            display: flex;
             width: 100%;
             height: 80vh;
-            padding: 10px;
-            box-sizing: border-box;
-            font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 4px;
             background-color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .line-numbers {
+            padding: 10px;
+            background-color: #eee;
+            color: #888;
+            border-right: 1px solid #ccc;
+            text-align: right;
+            user-select: none;
+            white-space: nowrap;
+            line-height: 1.5em;
+        }
+        .editor {
+            flex-grow: 1;
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            resize: none;
+            background-color: #fff;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.5em;
         }
         .button-container {
             position: fixed;
@@ -39,17 +61,71 @@
         .button-container button:hover {
             background-color: #0056b3;
         }
+        .custom-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            font-size: 18px;
+        }
+        .custom-alert button {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .custom-alert button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <h1>Simple Web Editor</h1>
-    <textarea id="editor" class="editor" placeholder="Type your text here..."></textarea>
+    <h1>Simple-C Editor</h1>
+    <div class="editor-container">
+        <div class="line-numbers" id="lineNumbers"></div>
+        <textarea id="editor" class="editor" placeholder="Type your text here..." oninput="updateLineNumbers()" onscroll="syncScroll()"></textarea>
+    </div>
     <div class="button-container">
         <button id="compileButton">Compile</button>
         <button id="detectButton">Detect</button>
     </div>
 
     <script>
+        function updateLineNumbers() {
+            var editor = document.getElementById('editor');
+            var lineNumbers = document.getElementById('lineNumbers');
+            var lines = editor.value.split('\n').length;
+            var lineNumbersHtml = '';
+            for (var i = 1; i <= lines; i++) {
+                lineNumbersHtml += i + '<br>';
+            }
+            lineNumbers.innerHTML = lineNumbersHtml;
+        }
+
+        function syncScroll() {
+            var editor = document.getElementById('editor');
+            var lineNumbers = document.getElementById('lineNumbers');
+            lineNumbers.scrollTop = editor.scrollTop;
+        }
+
+        function showAlert(message) {
+            var alertDiv = document.createElement('div');
+            alertDiv.className = 'custom-alert';
+            alertDiv.innerHTML = '<p>' + message + '</p><button onclick="this.parentElement.remove()">Close</button>';
+            document.body.appendChild(alertDiv);
+        }
+
         document.getElementById('compileButton').addEventListener('click', function() {
             var editorContent = document.getElementById('editor').value;
             fetch('/compile', {
@@ -62,7 +138,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'error') {
-                    alert('Error: ' + data.content);
+                    showAlert('Error: ' + data.content);
                 } else {
                     console.log('Success:', data);
                     // Do something with the success response if needed
@@ -85,15 +161,19 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'error') {
-                    alert('Error: ' + data.content);
+                    showAlert('Error: ' + data.content);
                 } else {
-                    console.log('Success:', data);
-                    // Do something with the success response if needed
+                    showAlert('Error Messages:\n' + data.error_messages);
                 }
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
+        });
+
+        // Initialize line numbers on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLineNumbers();
         });
     </script>
 </body>
