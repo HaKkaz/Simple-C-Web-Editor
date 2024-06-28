@@ -20,23 +20,3 @@ class Operation:
     
     def to_tuple(self):
         return (self.edt_actv, self.var_name, self.op, self.mod_node, self.Order)
-    
-"""
-a = 3;
-c = 4;
-b = 5;
-b = 5;
-d = a + b;
-"""
-
-# Only one node
-"""
-WRITE a node_1 
-WRITE c node_1
-
-WRITE b node_2
-READ a node_2
-
-READ b node_3
-WRTIE d node_3
-"""
