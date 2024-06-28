@@ -20,6 +20,10 @@ def detect_code():
                 temp = ff.read().split('\n')
                 for place_map in temp:
                     errorplace.append(place_map.split('|'))
+            first_place = 0
+            second_minor_place = 0
+            second_place = 0
+            second_minor_place = 0
             for i in range(len(errorplace)):
                 if errorplace[i][0] == error_data[2]:
                     first_place = errorplace[i][1]
@@ -44,6 +48,10 @@ def detect_code():
                 first_error = 'WRITE'
                 second_error = 'WRITE'
             
+            if error_data[1] == first_minor_place:
+                first_minor_place = ''
+            if error_data[1] == second_minor_place:
+                second_minor_place = ''
             error_messages += f'Data flow anomaly occur when variable {error_data[1]} {first_error} in line {first_place} {first_minor_place}'
             error_messages += f' and {second_error} in line {second_place} {second_minor_place}\n'
             print(error_messages)

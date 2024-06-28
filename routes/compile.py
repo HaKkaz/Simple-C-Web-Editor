@@ -37,6 +37,8 @@ def compile_code():
         # simple statement should contain a assignment operator
         #if len(line_variables) > 0 and line_operators[0] != '=':
         #    return jsonify({'status': 'error', 'content': f'Syntax error: Line: {i} Expected assignment operator'})
+        if len(lines[i].replace(' ', '')) == 0:
+            continue
         if len(line_variables) == 0:
             if lines[i][0] == '{':
                 node_number += 1
